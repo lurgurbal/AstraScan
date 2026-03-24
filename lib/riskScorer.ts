@@ -1,7 +1,5 @@
 /**
- * riskScorer.ts
- * Centralise le calcul du score de risque et produit un verdict lisible.
- * Peut être branché sur une API de réputation externe ultérieurement.
+ * riskScorer.ts (enhanced)
  */
 
 export type Verdict = "SCAM" | "SUSPICIOUS" | "SAFE";
@@ -9,42 +7,99 @@ export type Verdict = "SCAM" | "SUSPICIOUS" | "SAFE";
 export interface RiskResult {
   score: number;       // 0–100
   verdict: Verdict;
-  label: string;       // libellé affiché à l'utilisateur
+  label: string;
   emoji: string;
-  reasons: string[];   // liste des raisons détectées
-  color: string;       // classe Tailwind pour la couleur du badge
+  reasons: string[];
+  color: string;
+  confidence: number;  // 🔥 nouveau (fiabilité du verdict)
 }
 
-/**
- * Calcule le score final plafonné à 100 et retourne un RiskResult complet.
- * @param rawScore   Score brut accumulé par les analyseurs
- * @param reasons    Raisons collectées pendant l'analyse
- */
+// ---------------------------------------------------------------------------
+// CONFIG (facilement modifiable)
+// ---------------------------------------------------------------------------
+
+const THRESHOLDS = {
+  SCAM: 70,
+  SUSPICIOUS: 40,
+};
+
+const VERDICT_META = {
+  SCAM: {
+    label: "Probable arnaque",
+    emoji: "🚨",
+    color: "red",
+  },
+  SUSPICIOUS: {
+    label: "À vérifier",
+    emoji: "⚠️",
+    color: "amber",
+  },
+  SAFE: {
+    label: "Rien de flagrant (prudence)",
+    emoji: "✅",
+    color: "emerald",
+  },
+};
+
+// ---------------------------------------------------------------------------
+// HELPERS
+// ---------------------------------------------------------------------------
+
+// Clamp sécurisé
+function clamp(score: number): number {
+  if (!Number.isFinite(score)) return 0;
+  return Math.max(0, Math.min(100, score));
+}
+
+// Supprime doublons + nettoie
+function normalizeReasons(reasons: string[]): string[] {
+  return [...new Set(reasons.filter(Boolean))];
+}
+
+// Calcul de confiance (simple mais efficace)
+function computeConfidence(score: number, reasons: string[]): number {
+  /**
+   * Idée :
+   * - plus il y a de signaux → plus confiance ↑
+   * - plus score est extrême → plus confiance ↑
+   */
+  const reasonFactor = Math.min(1, reasons.length / 5);
+  const scoreFactor = Math.abs(score - 50) / 50;
+
+  const confidence = (reasonFactor * 0.6 + scoreFactor * 0.4) * 100;
+
+  return Math.round(confidence);
+}
+
+// ---------------------------------------------------------------------------
+// MAIN
+// ---------------------------------------------------------------------------
+
 export function computeRisk(rawScore: number, reasons: string[]): RiskResult {
-  // Plafonner le score entre 0 et 100
-  const score = Math.min(100, Math.max(0, rawScore));
+  const score = clamp(rawScore);
+  const cleanReasons = normalizeReasons(reasons);
 
   let verdict: Verdict;
-  let label: string;
-  let emoji: string;
-  let color: string;
 
-  if (score >= 70) {
+  if (score >= THRESHOLDS.SCAM) {
     verdict = "SCAM";
-    label = "Probable arnaque";
-    emoji = "🚨";
-    color = "red";
-  } else if (score >= 40) {
+  } else if (score >= THRESHOLDS.SUSPICIOUS) {
     verdict = "SUSPICIOUS";
-    label = "À vérifier";
-    emoji = "⚠️";
-    color = "amber";
   } else {
     verdict = "SAFE";
-    label = "Rien de flagrant (prudence)";
-    emoji = "✅";
-    color = "emerald";
   }
 
-  return { score, verdict, label, emoji, reasons, color };
+  const meta = VERDICT_META[verdict];
+
+  const confidence = computeConfidence(score, cleanReasons);
+
+  return {
+    score,
+    verdict,
+    label: meta.label,
+    emoji: meta.emoji,
+    color: meta.color,
+    reasons: cleanReasons,
+    confidence, // 🔥 super utile pour UI / tri / ML
+  };
 }

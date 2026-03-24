@@ -1,19 +1,51 @@
 /**
  * urlAnalyzer.ts
- * Analyse une URL pour détecter des signaux d'arnaque :
- *  - TLD suspects
- *  - Typosquatting (imitation de marques connues)
- *  - Structure inhabituelle (sous-domaines en excès, longueur anormale)
- *  - Présence dans une blacklist simulée
- *  - Caractères spéciaux ou encodés suspects
+ * ---------------------------------------------------------------------------
+ * 🔍 Analyse avancée d'URL pour détecter phishing, scam et comportements suspects
  *
- * TODO (prod) : brancher Google Safe Browsing, VirusTotal, WHOIS
+ * ✔ Détection :
+ *  - Blacklist (Google Safe Browsing simulé)
+ *  - VirusTotal (simulé)
+ *  - WHOIS (âge du domaine)
+ *  - TLD suspects
+ *  - Typosquatting (marques connues)
+ *  - Structure anormale (sous-domaines)
+ *  - Longueur excessive
+ *  - Mots-clés suspects
+ *  - IP au lieu de domaine
+ *  - URL obfusquée (@, encodage)
+ *  - HTTP non sécurisé
+ *  - Entropie élevée (URL aléatoire)
+ *
+ * 🚀 TODO PROD :
+ *  - Google Safe Browsing API
+ *  - VirusTotal API
+ *  - WHOIS réel
+ *  - DNS lookup / réputation IP
+ *
+ * 💡 Si tu veux aller encore plus loin (niveau startup / SaaS) :
+ *  - DNS + IP reputation (Cloudflare / AbuseIPDB)
+ *  - AI classifier (OpenAI / local model)
+ *  - GeoIP mismatch (user vs serveur)
+ *  - Dashboard de scoring
+ *  - API REST complète (Next.js route handler)
+ * ---------------------------------------------------------------------------
  */
 
 import { computeRisk, RiskResult } from "./riskScorer";
 
 // ---------------------------------------------------------------------------
-// Blacklist simulée (remplacer par un appel API en production)
+// CONFIG
+// ---------------------------------------------------------------------------
+
+const CONFIG = {
+  MAX_URL_LENGTH: 100,
+  HIGH_SUBDOMAIN_THRESHOLD: 4,
+  MEDIUM_SUBDOMAIN_THRESHOLD: 3,
+};
+
+// ---------------------------------------------------------------------------
+// BLACKLIST (SIMULÉE)
 // ---------------------------------------------------------------------------
 
 const SIMULATED_BLACKLIST: string[] = [
@@ -26,7 +58,7 @@ const SIMULATED_BLACKLIST: string[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// TLD suspects (fréquemment utilisés dans les arnaques)
+// TLD SUSPECTS
 // ---------------------------------------------------------------------------
 
 const SUSPICIOUS_TLDS = [
@@ -37,29 +69,23 @@ const SUSPICIOUS_TLDS = [
 ];
 
 // ---------------------------------------------------------------------------
-// Marques souvent imitées (typosquatting)
+// MARQUES CIBLES (TYPOSQUATTING)
 // ---------------------------------------------------------------------------
 
-const BRAND_TARGETS: { brand: string; variants: RegExp }[] = [
-  { brand: "PayPal",     variants: /paypa[^l]|p4ypal|payp4l|paypall|paypa1/i },
-  { brand: "Google",     variants: /g[0o][0o]gle|g00gle|g0ogle|go0gle|googel/i },
-  { brand: "Amazon",     variants: /amaz[o0]n|am4zon|amazoon|arnazon/i },
-  { brand: "Apple",      variants: /app1e|appl3|applle|aple/i },
-  { brand: "Microsoft",  variants: /micros[o0]ft|microsoift|m1crosoft/i },
-  { brand: "Netflix",    variants: /netfl1x|n3tflix|netfllx|netfix/i },
-  { brand: "Facebook",   variants: /faceb[o0][o0]k|faceb00k|facebok/i },
-  { brand: "Banque",     variants: /banque[^.]{0,10}\.(com|net|org|fr)|credit-agr[i1]cole|lcl[^.]/i },
-  { brand: "La Poste",   variants: /lapost[e3]|la-poste-|colis-laposte/i },
-  { brand: "DHL / FedEx / UPS", variants: /dh1\.com|fedex-[a-z]+\.com|ups-[a-z]+\.com/i },
-  { brand: "Impôts / Finances", variants: /impots?-(gouv|service)|finances-publiques|dgfip/i },
-  { brand: "Ameli / CAF / CPAM", variants: /ame1i|caf-[a-z]+|cpam-[a-z]+/i },
+const BRAND_TARGETS: { brand: string; regex: RegExp }[] = [
+  { brand: "PayPal", regex: /paypa[^l]|p4ypal|payp4l|paypall|paypa1/i },
+  { brand: "Google", regex: /g[0o][0o]gle|g00gle|g0ogle|go0gle|googel/i },
+  { brand: "Amazon", regex: /amaz[o0]n|am4zon|amazoon|arnazon/i },
+  { brand: "Apple", regex: /app1e|appl3|applle|aple/i },
+  { brand: "Microsoft", regex: /micros[o0]ft|microsoift|m1crosoft/i },
+  { brand: "Netflix", regex: /netfl1x|n3tflix|netfllx|netfix/i },
+  { brand: "Facebook", regex: /faceb[o0][o0]k|faceb00k|facebok/i },
 ];
 
 // ---------------------------------------------------------------------------
-// Helpers
+// HELPERS
 // ---------------------------------------------------------------------------
 
-/** Extrait le hostname d'une URL, ou null si invalide */
 function extractHostname(url: string): string | null {
   try {
     const parsed = new URL(url.startsWith("http") ? url : `https://${url}`);
@@ -69,68 +95,63 @@ function extractHostname(url: string): string | null {
   }
 }
 
-/** Extrait le TLD (extension) d'un hostname */
 function extractTLD(hostname: string): string {
   const parts = hostname.split(".");
-  if (parts.length < 2) return "";
-  return "." + parts[parts.length - 1];
+  return parts.length > 1 ? "." + parts.pop() : "";
 }
 
-/** Compte le nombre de sous-domaines dans un hostname */
 function countSubdomains(hostname: string): number {
-  // www.example.com → 0 sous-domaine "réel", secure.login.paypal.fake.com → beaucoup
-  const parts = hostname.split(".");
-  return Math.max(0, parts.length - 2);
+  return Math.max(0, hostname.split(".").length - 2);
+}
+
+function isIPAddress(hostname: string): boolean {
+  return /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname);
+}
+
+/**
+ * Calcule une entropie simple pour détecter les URLs "random"
+ */
+function calculateEntropy(str: string): number {
+  const map: Record<string, number> = {};
+  for (const char of str) {
+    map[char] = (map[char] || 0) + 1;
+  }
+
+  const len = str.length;
+  return Object.values(map).reduce((entropy, count) => {
+    const p = count / len;
+    return entropy - p * Math.log2(p);
+  }, 0);
 }
 
 // ---------------------------------------------------------------------------
-// Checks externes simulés (à remplacer par de vraies API en prod)
+// SIMULATIONS API (À REMPLACER)
 // ---------------------------------------------------------------------------
 
-/**
- * Simule une vérification Google Safe Browsing.
- * En production : appel à https://safebrowsing.googleapis.com/v4/threatMatches:find
- */
 async function checkGoogleSafeBrowsing(url: string): Promise<boolean> {
-  // TODO: implémenter l'appel réel
-  // const response = await fetch(`https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${process.env.GOOGLE_SB_API_KEY}`, { ... });
-  return SIMULATED_BLACKLIST.some((blocked) => url.includes(blocked));
+  return SIMULATED_BLACKLIST.some((b) => url.includes(b));
 }
 
-/**
- * Simule une vérification VirusTotal.
- * En production : appel à https://www.virustotal.com/api/v3/urls
- */
 async function checkVirusTotal(_url: string): Promise<boolean> {
-  // TODO: implémenter l'appel réel
   return false;
 }
 
-/**
- * Simule un lookup WHOIS pour détecter les domaines récemment créés.
- * En production : utiliser un service WHOIS ou l'API whoisxmlapi.com
- */
 async function checkWhois(_hostname: string): Promise<{ isNew: boolean }> {
-  // TODO: implémenter l'appel réel
   return { isNew: false };
 }
 
 // ---------------------------------------------------------------------------
-// Fonction principale d'analyse
+// ANALYSE PRINCIPALE
 // ---------------------------------------------------------------------------
 
 export interface UrlAnalysisInput {
   url: string;
 }
 
-/**
- * Analyse une URL et retourne un RiskResult.
- * @param input  Objet contenant l'URL à analyser
- */
 export async function analyzeUrl(input: UrlAnalysisInput): Promise<RiskResult> {
   const { url } = input;
 
-  if (!url || url.trim().length === 0) {
+  if (!url?.trim()) {
     return computeRisk(0, ["Aucune URL fournie"]);
   }
 
@@ -138,104 +159,132 @@ export async function analyzeUrl(input: UrlAnalysisInput): Promise<RiskResult> {
   const hostname = extractHostname(rawUrl);
 
   if (!hostname) {
-    return computeRisk(30, ["URL invalide ou impossible à analyser"]);
+    return computeRisk(30, ["URL invalide"]);
   }
 
-  let rawScore = 0;
+  let score = 0;
   const reasons: string[] = [];
 
-  // 1. Vérification blacklist (simulée)
-  const isBlacklisted = await checkGoogleSafeBrowsing(rawUrl);
-  if (isBlacklisted) {
-    rawScore += 60;
-    reasons.push("URL présente dans la blacklist de sécurité (Google Safe Browsing simulé)");
+  // -----------------------------------------------------------------------
+  // 1. BLACKLIST
+  // -----------------------------------------------------------------------
+  if (await checkGoogleSafeBrowsing(rawUrl)) {
+    score += 60;
+    reasons.push("Présente dans une blacklist de sécurité");
   }
 
-  // 2. VirusTotal (simulé)
-  const isVirusTotal = await checkVirusTotal(rawUrl);
-  if (isVirusTotal) {
-    rawScore += 40;
-    reasons.push("Signalée comme malveillante par VirusTotal (simulé)");
+  if (await checkVirusTotal(rawUrl)) {
+    score += 40;
+    reasons.push("Signalée comme malveillante (VirusTotal)");
   }
 
-  // 3. TLD suspect
+  // -----------------------------------------------------------------------
+  // 2. TLD
+  // -----------------------------------------------------------------------
   const tld = extractTLD(hostname);
   if (SUSPICIOUS_TLDS.includes(tld)) {
-    rawScore += 20;
-    reasons.push(`TLD suspect détecté : ${tld}`);
+    score += 20;
+    reasons.push(`TLD suspect : ${tld}`);
   }
 
-  // 4. Typosquatting
-  for (const target of BRAND_TARGETS) {
-    if (target.variants.test(hostname)) {
-      rawScore += 35;
-      reasons.push(`Possible imitation de la marque "${target.brand}" (typosquatting)`);
-      break; // On ne pénalise qu'une fois
+  // -----------------------------------------------------------------------
+  // 3. TYPOSQUATTING
+  // -----------------------------------------------------------------------
+  for (const { brand, regex } of BRAND_TARGETS) {
+    if (regex.test(hostname)) {
+      score += 35;
+      reasons.push(`Imitation possible de ${brand}`);
+      break;
     }
   }
 
-  // 5. Nombre de sous-domaines excessif
-  const subdomainCount = countSubdomains(hostname);
-  if (subdomainCount >= 4) {
-    rawScore += 25;
-    reasons.push(`Structure suspecte : ${subdomainCount} niveaux de sous-domaines (ex : login.secure.bank.xyz.com)`);
-  } else if (subdomainCount >= 3) {
-    rawScore += 10;
-    reasons.push(`Nombre de sous-domaines élevé (${subdomainCount})`);
+  // -----------------------------------------------------------------------
+  // 4. STRUCTURE
+  // -----------------------------------------------------------------------
+  const subdomains = countSubdomains(hostname);
+
+  if (subdomains >= CONFIG.HIGH_SUBDOMAIN_THRESHOLD) {
+    score += 25;
+    reasons.push(`Trop de sous-domaines (${subdomains})`);
+  } else if (subdomains >= CONFIG.MEDIUM_SUBDOMAIN_THRESHOLD) {
+    score += 10;
+    reasons.push(`Sous-domaines nombreux (${subdomains})`);
   }
 
-  // 6. URL excessivement longue
-  if (rawUrl.length > 100) {
-    rawScore += 10;
-    reasons.push(`URL anormalement longue (${rawUrl.length} caractères)`);
+  // -----------------------------------------------------------------------
+  // 5. LONGUEUR
+  // -----------------------------------------------------------------------
+  if (rawUrl.length > CONFIG.MAX_URL_LENGTH) {
+    score += 10;
+    reasons.push("URL anormalement longue");
   }
 
-  // 7. Présence de mots-clés suspects dans l'URL
-  const suspiciousKeywords = [
-    "login", "signin", "verify", "secure", "update", "confirm",
-    "account", "wallet", "reset", "password", "urgent", "alert",
-    "suspended", "limite", "validation", "authentification",
+  // -----------------------------------------------------------------------
+  // 6. MOTS-CLÉS
+  // -----------------------------------------------------------------------
+  const keywords = [
+    "login", "verify", "secure", "account",
+    "password", "urgent", "alert", "confirm",
   ];
-  const urlLower = rawUrl.toLowerCase();
-  const matchedKeywords = suspiciousKeywords.filter((kw) => urlLower.includes(kw));
-  if (matchedKeywords.length >= 3) {
-    rawScore += 20;
-    reasons.push(`Accumulation de mots-clés suspects dans l'URL : ${matchedKeywords.join(", ")}`);
-  } else if (matchedKeywords.length >= 1) {
-    rawScore += 10;
-    reasons.push(`Mots-clés suspects dans l'URL : ${matchedKeywords.join(", ")}`);
+
+  const found = keywords.filter(k => rawUrl.toLowerCase().includes(k));
+
+  if (found.length >= 3) {
+    score += 20;
+    reasons.push(`Beaucoup de mots suspects : ${found.join(", ")}`);
+  } else if (found.length > 0) {
+    score += 10;
+    reasons.push(`Mot suspect détecté : ${found.join(", ")}`);
   }
 
-  // 8. IP au lieu d'un domaine
-  const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
-  if (ipPattern.test(hostname)) {
-    rawScore += 30;
-    reasons.push("L'URL utilise une adresse IP au lieu d'un nom de domaine");
+  // -----------------------------------------------------------------------
+  // 7. IP
+  // -----------------------------------------------------------------------
+  if (isIPAddress(hostname)) {
+    score += 30;
+    reasons.push("Utilisation d'une adresse IP");
   }
 
-  // 9. Caractères encodés ou @ dans l'URL (technique de masquage)
-  if (rawUrl.includes("%40") || rawUrl.includes("@")) {
-    rawScore += 20;
-    reasons.push("Présence d'un caractère '@' dans l'URL (technique de masquage du vrai domaine)");
+  // -----------------------------------------------------------------------
+  // 8. OBFUSCATION
+  // -----------------------------------------------------------------------
+  if (rawUrl.includes("@") || rawUrl.includes("%40")) {
+    score += 20;
+    reasons.push("URL obfusquée (@)");
   }
 
-  // 10. Protocole non sécurisé
+  // -----------------------------------------------------------------------
+  // 9. HTTP
+  // -----------------------------------------------------------------------
   if (rawUrl.startsWith("http://")) {
-    rawScore += 10;
-    reasons.push("Connexion non sécurisée (HTTP sans HTTPS)");
+    score += 10;
+    reasons.push("Connexion non sécurisée (HTTP)");
   }
 
-  // 11. WHOIS — domaine récent (simulé)
+  // -----------------------------------------------------------------------
+  // 10. ENTROPIE (URL RANDOM)
+  // -----------------------------------------------------------------------
+  const entropy = calculateEntropy(rawUrl);
+  if (entropy > 4.5) {
+    score += 15;
+    reasons.push("URL très aléatoire (entropie élevée)");
+  }
+
+  // -----------------------------------------------------------------------
+  // 11. WHOIS
+  // -----------------------------------------------------------------------
   const whois = await checkWhois(hostname);
   if (whois.isNew) {
-    rawScore += 20;
-    reasons.push("Domaine créé récemment (moins de 30 jours) — signal typique d'arnaque");
+    score += 20;
+    reasons.push("Domaine récent");
   }
 
-  // Aucune anomalie
+  // -----------------------------------------------------------------------
+  // FINAL
+  // -----------------------------------------------------------------------
   if (reasons.length === 0) {
-    reasons.push("Aucun signal suspect détecté dans cette URL");
+    reasons.push("Aucun signal suspect");
   }
 
-  return computeRisk(rawScore, reasons);
+  return computeRisk(score, reasons);
 }
