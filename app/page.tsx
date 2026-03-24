@@ -2,7 +2,7 @@
 
 /**
  * app/page.tsx
- * Page principale de ScamDetector.
+ * Page principale de AstraScan.
  * Deux onglets : Analyser un message | Analyser une URL.
  */
 
@@ -48,8 +48,8 @@ export default function HomePage() {
 
           {/* Titre principal */}
           <h1 className="mb-3 text-5xl sm:text-6xl font-bold tracking-tight leading-none">
-            <span className="text-white">Scam</span>
-            <span className="text-red-500">Detector</span>
+            <span className="text-white">Astra</span>
+            <span className="text-red-500">Scan</span>
           </h1>
 
           <p className="text-base text-white/50 max-w-md mx-auto leading-relaxed">
@@ -125,7 +125,7 @@ export default function HomePage() {
 
         {/* ── Footer ── */}
         <footer className="mt-10 text-center text-xs text-white/20 space-y-1">
-          <p>ScamDetector — Outil d&apos;aide à la détection, non substitut à un avis professionnel.</p>
+          <p>AstraScan — Outil d&apos;aide à la détection, non substitut à un avis professionnel.</p>
           <p>En cas d&apos;arnaque avérée, signalez sur <strong className="text-white/40">signal-spam.fr</strong> ou <strong className="text-white/40">phishing-initiative.fr</strong>.</p>
         </footer>
       </div>

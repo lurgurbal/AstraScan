@@ -25,13 +25,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ScamDetector — Détectez les arnaques en un clic",
+  title: "AstraScan — Détectez les arnaques en un clic",
   description:
     "Analysez gratuitement vos messages suspects et URLs pour détecter les tentatives de phishing, arnaques et fraudes en ligne.",
-  keywords: ["arnaque", "phishing", "scam", "détecteur", "sécurité", "fraud"],
-  authors: [{ name: "ScamDetector" }],
+  keywords: ["arnaque", "phishing", "scam", "détecteur", "sécurité", "fraud", "astrascan"],
+  authors: [{ name: "AstraScan" }],
   openGraph: {
-    title: "ScamDetector — Détectez les arnaques",
+    title: "AstraScan — Détectez les arnaques",
     description: "Analysez messages et URLs suspects gratuitement",
     type: "website",
   },

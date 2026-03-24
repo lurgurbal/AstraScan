@@ -1,5 +1,5 @@
 {
-  "name": "scam-detector",
+  "name": "astra-scan",
   "version": "0.1.0",
   "private": true,
   "description": "MVP de détection d'arnaques : analyse de messages et URLs suspects",
