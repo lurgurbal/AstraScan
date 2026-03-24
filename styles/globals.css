@@ -1,82 +1,87 @@
-/* styles/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── Variables CSS globales ── */
 :root {
   --font-sans: var(--font-sans, 'Space Grotesk', system-ui, sans-serif);
   --font-mono: var(--font-mono, 'JetBrains Mono', monospace);
 }
 
-/* ── Reset & base ── */
-*, *::before, *::after {
-  box-sizing: border-box;
+/* ── Mode sombre (défaut) ── */
+html, html.dark {
+  color-scheme: dark;
 }
 
-html {
-  scroll-behavior: smooth;
+/* ── Mode clair ── */
+html.light {
+  color-scheme: light;
 }
 
-body {
-  font-family: var(--font-sans);
-  background: #070809;
-  color: #ffffff;
+html.light body {
+  background: #f8f9fa;
+  color: #111;
 }
 
-/* ── Typographie ── */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-sans);
-  letter-spacing: -0.02em;
+html.light .bg-\[#070809\] {
+  background: #f8f9fa !important;
 }
 
-code, pre, .font-mono {
-  font-family: var(--font-mono);
+html.light .text-white {
+  color: #111 !important;
 }
 
-/* ── Scrollbar custom (Webkit) ── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+html.light .text-white\/50,
+html.light .text-white\/40,
+html.light .text-white\/30,
+html.light .text-white\/20,
+html.light .text-white\/25,
+html.light .text-white\/60,
+html.light .text-white\/70 {
+  color: rgba(0,0,0,0.5) !important;
 }
 
-/* ── Animation : entrée du ResultCard ── */
+html.light .border-white\/8,
+html.light .border-white\/10,
+html.light .border-white\/15 {
+  border-color: rgba(0,0,0,0.1) !important;
+}
+
+html.light .bg-white\/\[0\.02\],
+html.light .bg-white\/\[0\.03\],
+html.light .bg-white\/5 {
+  background: rgba(0,0,0,0.03) !important;
+}
+
+html.light .bg-white\/10 {
+  background: rgba(0,0,0,0.06) !important;
+}
+
+html.light textarea,
+html.light input[type="text"] {
+  background: white !important;
+  border-color: rgba(0,0,0,0.15) !important;
+  color: #111 !important;
+}
+
+html.light textarea::placeholder,
+html.light input::placeholder {
+  color: rgba(0,0,0,0.35) !important;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-sans); }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
 @keyframes fadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Selection color ── */
-::selection {
-  background: rgba(239, 68, 68, 0.3);
-  color: #fff;
-}
-
-/* ── Focus visible accessible ── */
-:focus-visible {
-  outline: 2px solid rgba(239, 68, 68, 0.5);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* ── Textarea resize indicator ── */
-textarea {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.1) transparent;
-}
+::selection { background: rgba(239,68,68,0.3); color: #fff; }
+:focus-visible { outline: 2px solid rgba(239,68,68,0.5); outline-offset: 2px; border-radius: 4px; }
+textarea { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }

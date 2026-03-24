@@ -1,8 +1,8 @@
 {
   "name": "astra-scan",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "MVP de détection d'arnaques : analyse de messages et URLs suspects",
+  "description": "Détecteur d'arnaques : analyse messages, URLs et captures d'écran",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -13,7 +13,8 @@
   "dependencies": {
     "next": "14.2.5",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "tesseract.js": "^5.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.10",

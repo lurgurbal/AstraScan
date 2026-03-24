@@ -30,6 +30,13 @@ export const metadata: Metadata = {
     "Analysez gratuitement vos messages suspects et URLs pour détecter les tentatives de phishing, arnaques et fraudes en ligne.",
   keywords: ["arnaque", "phishing", "scam", "détecteur", "sécurité", "fraud", "astrascan"],
   authors: [{ name: "AstraScan" }],
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    apple: "/favicon.svg",
+  },
   openGraph: {
     title: "AstraScan — Détectez les arnaques",
     description: "Analysez messages et URLs suspects gratuitement",
