@@ -1,0 +1,82 @@
+/* styles/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Variables CSS globales ── */
+:root {
+  --font-sans: var(--font-sans, 'Space Grotesk', system-ui, sans-serif);
+  --font-mono: var(--font-mono, 'JetBrains Mono', monospace);
+}
+
+/* ── Reset & base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: #070809;
+  color: #ffffff;
+}
+
+/* ── Typographie ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  letter-spacing: -0.02em;
+}
+
+code, pre, .font-mono {
+  font-family: var(--font-mono);
+}
+
+/* ── Scrollbar custom (Webkit) ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Animation : entrée du ResultCard ── */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Selection color ── */
+::selection {
+  background: rgba(239, 68, 68, 0.3);
+  color: #fff;
+}
+
+/* ── Focus visible accessible ── */
+:focus-visible {
+  outline: 2px solid rgba(239, 68, 68, 0.5);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Textarea resize indicator ── */
+textarea {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
