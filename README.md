@@ -8,11 +8,6 @@
 ![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel)
 
 ---
-## 🎯 Pourquoi AstraScan ?
-
-Aujourd'hui, les arnaques en ligne explosent (phishing, faux SMS, crypto scams...).
-AstraScan a été conçu pour aider rapidement à identifier les signaux
-de fraude sans connaissances techniques.
 
 ## ✨ Fonctionnalités
 
@@ -26,10 +21,6 @@ de fraude sans connaissances techniques.
 
 ## 🚀 Démarrage rapide
 
-## 🌐 Live Demo
-
-👉 https://astra-scan.vercel.app
-
 ### Prérequis
 - Node.js 18+
 - npm ou yarn
@@ -38,9 +29,8 @@ de fraude sans connaissances techniques.
 
 ```bash
 # 1. Cloner le dépôt
-git clone ... scam-detector.git
+git clone https://github.com/VOTRE_USERNAME/scam-detector.git
 cd astra-scan
-
 
 # 2. Installer les dépendances
 npm install
@@ -120,13 +110,6 @@ astra-scan/
 | HTTP sans HTTPS | http://... | +10 |
 | Mots-clés suspects | login, verify, secure, account, reset | +10 à +20 |
 
-## 🧮 Comment le score est calculé ?
-
-Le score est basé sur une accumulation de signaux pondérés.
-Chaque règle ajoute des points selon sa criticité.
-
-Le score est ensuite normalisé entre 0 et 100.
-
 ### Verdict final
 
 ```
@@ -160,16 +143,7 @@ async function checkVirusTotal(url: string): Promise<boolean> {
 }
 ```
 
-- AstraScan peut être configuré pour utiliser des services tiers comme Google Safe Browsing ou VirusTotal
-- Dans ce cas, certaines URLs analysées peuvent être envoyées à ces services pour vérification
-- Les politiques de confidentialité de ces services s’appliquent également
-
 ---
-### ☁️ Hébergement
-
-- L'application est hébergée sur une infrastructure sécurisée (Vercel)
-- Aucune base de données n’est utilisée par défaut
-- Aucun stockage persistant des données utilisateur
 
 ## 🚢 Déploiement sur Vercel
 
@@ -195,50 +169,19 @@ npm run start      # Serveur de production
 npm run type-check # Vérification TypeScript sans compilation
 npm run lint       # ESLint
 ```
+
 ---
 
 ## ⚠️ Avertissement légal
 
-AstraScan est un outil d’aide à la détection basé sur des heuristiques.
+AstraScan est un outil d'aide à la détection, pas un substitut à un avis professionnel. En cas d'arnaque avérée :
 
-- Les résultats fournis ne garantissent pas qu’un message ou une URL est frauduleux ou sûr à 100%
-- L’utilisateur reste responsable de ses décisions
-- En cas de doute, ne partagez jamais vos informations sensibles (mot de passe, code SMS, coordonnées bancaires)
-
----
-
-## 🚨 Signaler une arnaque
-
-Si vous pensez avoir identifié une arnaque, vous pouvez la signaler facilement :
-
-### 🇫🇷 Plateformes françaises
-
-- **Signal Spam** → https://www.signal-spam.fr  
-- **Phishing Initiative** → https://phishing-initiative.fr  
-- **Cybermalveillance.gouv.fr** → https://www.cybermalveillance.gouv.fr  
-
-### 🇪🇺 Niveau européen
-
-- **Europol (signalement cybercrime)** → https://www.europol.europa.eu/report-a-crime  
+- **Signal Spam** → [signal-spam.fr](https://www.signal-spam.fr)
+- **Phishing Initiative** → [phishing-initiative.fr](https://phishing-initiative.fr)
+- **Cybermalveillance.gouv.fr** → [cybermalveillance.gouv.fr](https://www.cybermalveillance.gouv.fr)
 
 ---
-
-## 🔐 Confidentialité & RGPD
-
-AstraScan respecte les principes du Règlement Général sur la Protection des Données (RGPD).
-
-### 🛡️ Protection des données
-
-- Les messages et URLs analysés ne sont **pas stockés**
-- Aucun historique n’est conservé
-- Aucun compte utilisateur n’est requis
-- Aucun tracking ou analytics intrusif n’est utilisé
-- Les données sont traitées **en mémoire uniquement** et supprimées immédiatement après analyse
-
-
 
 ## 📄 Licence
 
 MIT — Libre d'utilisation, modification et distribution.
-![License](https://img.shields.io/badge/license-MIT-green)
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)

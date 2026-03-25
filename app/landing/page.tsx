@@ -62,7 +62,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <Link
-              href="/"
+              href="/app"
               className="px-4 py-2 rounded-xl bg-white text-black text-sm font-semibold hover:bg-white/90 transition-all duration-200"
             >
               Lancer l&apos;outil →
@@ -99,7 +99,7 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
-              href="/"
+              href="/app"
               className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white text-black font-semibold text-base hover:bg-white/90 transition-all duration-200"
             >
               🔍 Analyser maintenant
@@ -184,7 +184,7 @@ export default function LandingPage() {
           <h2 className="text-3xl font-bold mb-4">Prêt à analyser ?</h2>
           <p className="text-white/40 text-sm mb-8">Aucune inscription. Aucune installation. Gratuit.</p>
           <Link
-            href="/"
+            href="/app"
             className="inline-flex px-10 py-4 rounded-xl bg-white text-black font-semibold text-base hover:bg-white/90 transition-all duration-200"
           >
             🔍 Lancer AstraScan →

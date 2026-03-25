@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AstraScan</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { width: 320px; font-family: system-ui, sans-serif; background: #070809; color: #fff; }
+    .header { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-size: 18px; font-weight: 700; }
+    .logo span { color: #ef4444; }
+    .badge { font-size: 10px; color: rgba(255,255,255,0.3); }
+    .section { padding: 14px 16px; }
+    .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.35); margin-bottom: 8px; }
+    .url-display { font-size: 11px; color: rgba(255,255,255,0.5); font-family: monospace; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; word-break: break-all; max-height: 48px; overflow: hidden; }
+    .btn { width: 100%; padding: 10px; border-radius: 10px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.15s; }
+    .btn-primary { background: #fff; color: #000; }
+    .btn-primary:hover { background: rgba(255,255,255,0.9); }
+    .btn-secondary { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.1); margin-top: 6px; }
+    .result { margin: 0 16px 14px; border-radius: 10px; padding: 12px; }
+    .result.red { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); }
+    .result.amber { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); }
+    .result.emerald { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); }
+    .result-label { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .result-score { font-size: 11px; opacity: 0.6; margin-top: 4px; }
+    .result-reasons { font-size: 11px; opacity: 0.65; margin-top: 8px; line-height: 1.5; }
+    .progress { height: 3px; border-radius: 2px; background: rgba(255,255,255,0.1); margin-top: 8px; overflow: hidden; }
+    .progress-bar { height: 100%; border-radius: 2px; transition: width 0.5s; }
+    .loading { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; color: rgba(255,255,255,0.4); font-size: 12px; }
+    .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.15); border-top-color: rgba(255,255,255,0.6); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .footer { padding: 10px 16px; border-top: 1px solid rgba(255,255,255,0.06); text-align: center; }
+    .footer a { font-size: 11px; color: rgba(255,255,255,0.25); text-decoration: none; }
+    .footer a:hover { color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">Astra<span>Scan</span></div>
+    <div class="badge">v1.0</div>
+  </div>
+  <div class="section">
+    <div class="label">Page courante</div>
+    <div class="url-display" id="current-url">Chargement…</div>
+  </div>
+  <div class="section" style="padding-top:0">
+    <button class="btn btn-primary" id="analyze-btn">🔍 Analyser cette page</button>
+    <button class="btn btn-secondary" id="open-tool-btn">Ouvrir AstraScan complet →</button>
+  </div>
+  <div id="result-container"></div>
+  <div class="footer">
+    <a href="https://astra-scan.vercel.app" target="_blank">astra-scan.vercel.app</a>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
