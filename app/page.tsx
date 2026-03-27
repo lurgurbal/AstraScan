@@ -1,4 +1,9 @@
 "use client";
+/**
+ * app/page.tsx — Outil principal AstraScan (route "/").
+ * CORRECTION : c'est "/" pas "/app" → landing pointe correctement ici.
+ */
+
 import { useState } from "react";
 import Link from "next/link";
 import TextForm from "@/components/TextForm";
@@ -11,60 +16,78 @@ import ThemeToggle from "@/components/ThemeToggle";
 import ThreatFeed from "@/components/ThreatFeed";
 
 type Tab = "text" | "url" | "image" | "phone";
+
 const TABS: { id: Tab; icon: string; label: string; desc: string }[] = [
-  { id: "text",  icon: "💬", label: "Message",  desc: "SMS, e-mail ou WhatsApp suspect — analyse linguistique avancée sans liste de mots, détection psychologique et sémantique." },
-  { id: "url",   icon: "🔗", label: "URL",       desc: "Lien suspect — détection typosquatting par algorithme Levenshtein, vérification PhishTank en temps réel, analyse structurelle." },
-  { id: "image", icon: "📸", label: "Capture",   desc: "Screenshot suspect — OCR Tesseract local (gratuit), puis analyse avancée du texte extrait. Analyse deepfake des métadonnées EXIF." },
-  { id: "phone", icon: "📞", label: "Téléphone", desc: "Numéro suspect — détection numéros surtaxés, VoIP, Wangiri international, spoofing et patterns frauduleux." },
+  { id: "text",  icon: "💬", label: "Message",   desc: "SMS, e-mail ou WhatsApp — analyse linguistique avancée, détection psychologique et sémantique sans liste de mots." },
+  { id: "url",   icon: "🔗", label: "URL",        desc: "Lien suspect — Levenshtein typosquatting, PhishTank temps réel, testeur HTTP, analyse structurelle." },
+  { id: "image", icon: "📸", label: "Capture",    desc: "Screenshot — OCR Tesseract local (gratuit), analyse du texte extrait + deepfake EXIF." },
+  { id: "phone", icon: "📞", label: "Téléphone",  desc: "Numéro suspect — surtaxés 08xx, VoIP, Wangiri international, spoofing SMS." },
 ];
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState<Tab>("text");
+
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#070809] transition-colors duration-300">
-      <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-red-600/10 blur-[120px]" />
-        <div className="absolute top-1/3 -right-40 h-[400px] w-[400px] rounded-full bg-orange-500/8 blur-[100px]" />
-        <div className="absolute inset-0 opacity-[0.025]"
-          style={{ backgroundImage: "linear-gradient(#ffffff 1px,transparent 1px),linear-gradient(90deg,#ffffff 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
-      </div>
-      <div className="relative z-10 mx-auto max-w-2xl px-4 py-12 sm:py-20">
+    <main className="page-glow-red grid-bg" style={{ minHeight: "100vh", position: "relative" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 672, margin: "0 auto", padding: "48px 16px 80px" }}>
+
         {/* Nav */}
-        <div className="flex items-center justify-between mb-10">
-          <Link href="/landing" className="text-xs text-white/30 hover:text-white/60 transition-colors">← Accueil</Link>
-          <span className="text-lg font-bold"><span className="text-white">Astra</span><span className="text-red-500">Scan</span></span>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 40 }}>
+          <Link href="/landing" style={{ fontSize: 12, color: "var(--text-muted)", textDecoration: "none" }}>
+            ← Accueil
+          </Link>
+          <span style={{ fontSize: 18, fontWeight: 700 }}>
+            <span style={{ color: "var(--text-primary)" }}>Astra</span>
+            <span style={{ color: "#ef4444" }}>Scan</span>
+          </span>
           <ThemeToggle />
         </div>
 
         {/* Header */}
-        <header className="mb-8 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/10 px-4 py-1.5 text-xs text-red-400 font-medium">
-            <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" /><span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" /></span>
-            Moteur v2 — Analyse contextuelle sans liste de mots
+        <header style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8, borderRadius: 999,
+            border: "1px solid rgba(239,68,68,0.25)", background: "rgba(239,68,68,0.08)",
+            padding: "5px 14px", fontSize: 11, color: "#ef4444", fontWeight: 500, marginBottom: 16,
+          }}>
+            <span style={{ position: "relative", display: "inline-flex", width: 7, height: 7 }}>
+              <span style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "rgba(239,68,68,0.5)", animation: "ping 1.5s ease-in-out infinite" }} />
+              <span style={{ position: "relative", width: 7, height: 7, borderRadius: "50%", background: "#ef4444" }} />
+            </span>
+            Moteur v3 · Sources officielles françaises
           </div>
-          <h1 className="mb-2 text-5xl sm:text-6xl font-bold tracking-tight leading-none">
-            <span className="text-white">Astra</span><span className="text-red-500">Scan</span>
+
+          <h1 style={{ fontSize: "clamp(2.5rem, 8vw, 3.5rem)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: 10 }}>
+            <span style={{ color: "var(--text-primary)" }}>Astra</span>
+            <span style={{ color: "#ef4444" }}>Scan</span>
           </h1>
-          <p className="text-sm text-white/45 max-w-lg mx-auto leading-relaxed">
-            Analyse linguistique avancée · Levenshtein typosquatting · PhishTank · OCR · Deepfake EXIF · Alertes temps réel
+          <p style={{ fontSize: 13, color: "var(--text-secondary)", maxWidth: 500, margin: "0 auto", lineHeight: 1.7 }}>
+            Moteur contextuel · Levenshtein · PhishTank · OCR · EXIF · DGCCRF · Cybermalveillance
           </p>
         </header>
 
-        {/* Onglets */}
-        <div className="rounded-2xl border border-white/8 bg-white/[0.03] backdrop-blur-sm shadow-2xl shadow-black/50 mb-4">
-          <div className="grid grid-cols-4 border-b border-white/8">
+        {/* Carte principale */}
+        <div className="card" style={{ marginBottom: 16, overflow: "hidden" }}>
+          {/* Onglets */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", borderBottom: "1px solid var(--border-default)" }}>
             {TABS.map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center gap-1 py-3.5 text-xs font-medium transition-all duration-200 ${
-                  activeTab === tab.id ? "text-white border-b-2 border-red-500 bg-white/[0.02]" : "text-white/35 hover:text-white/65 border-b-2 border-transparent"
-                }`}>
-                <span className="text-lg">{tab.icon}</span>
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                padding: "14px 4px", fontSize: 11, fontWeight: 500, cursor: "pointer",
+                background: activeTab === tab.id ? "var(--bg-subtle)" : "transparent",
+                color: activeTab === tab.id ? "var(--text-primary)" : "var(--text-muted)",
+                borderBottom: activeTab === tab.id ? "2px solid #ef4444" : "2px solid transparent",
+                border: "none", transition: "all 0.15s",
+              }}>
+                <span style={{ fontSize: 18 }}>{tab.icon}</span>
                 <span>{tab.label}</span>
               </button>
             ))}
           </div>
-          <div className="p-6">
-            <p className="mb-5 text-xs text-white/35 leading-relaxed">
+
+          {/* Contenu */}
+          <div style={{ padding: 24 }}>
+            <p style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 20 }}>
               {TABS.find(t => t.id === activeTab)?.desc}
             </p>
             {activeTab === "text"  && <TextForm />}
@@ -77,17 +100,17 @@ export default function HomePage() {
         {/* Alertes temps réel */}
         <ThreatFeed />
 
-        {/* Légende */}
-        <div className="mt-4 grid grid-cols-3 gap-3">
+        {/* Légende scores */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginTop: 16 }}>
           {[
-            { emoji: "🚨", label: "Probable arnaque", range: "≥ 70", border: "border-red-500/20 bg-red-500/5" },
-            { emoji: "⚠️", label: "À vérifier", range: "≥ 40", border: "border-amber-500/20 bg-amber-500/5" },
-            { emoji: "✅", label: "Rien de flagrant", range: "< 40", border: "border-emerald-500/20 bg-emerald-500/5" },
+            { emoji: "🚨", label: "Probable arnaque", range: "≥ 70", bg: "rgba(239,68,68,0.07)", border: "rgba(239,68,68,0.2)" },
+            { emoji: "⚠️", label: "À vérifier",       range: "≥ 40", bg: "rgba(245,158,11,0.07)", border: "rgba(245,158,11,0.2)" },
+            { emoji: "✅", label: "Rien de flagrant", range: "< 40",  bg: "rgba(16,185,129,0.07)", border: "rgba(16,185,129,0.2)" },
           ].map(item => (
-            <div key={item.label} className={`rounded-xl border ${item.border} p-3 text-center`}>
-              <div className="text-xl mb-1">{item.emoji}</div>
-              <div className="text-xs font-medium text-white/65">{item.label}</div>
-              <div className="text-[10px] text-white/30 mt-0.5 font-mono">Score {item.range}</div>
+            <div key={item.label} style={{ borderRadius: 12, border: `1px solid ${item.border}`, background: item.bg, padding: "12px 8px", textAlign: "center" }}>
+              <div style={{ fontSize: 20, marginBottom: 4 }}>{item.emoji}</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-secondary)" }}>{item.label}</div>
+              <div style={{ fontSize: 10, color: "var(--text-muted)", fontFamily: "var(--font-mono)", marginTop: 2 }}>Score {item.range}</div>
             </div>
           ))}
         </div>
@@ -95,9 +118,22 @@ export default function HomePage() {
         <StatsBar />
         <HistoryPanel />
 
-        <footer className="mt-10 text-center text-xs text-white/20 space-y-1">
-          <p>AstraScan v2 — Moteur contextuel · PhishTank · Levenshtein · Tesseract OCR · EXIF</p>
-          <p>Signaler : <a className="text-white/35 hover:text-white/55 transition-colors" href="https://signal-spam.fr" target="_blank" rel="noopener noreferrer">signal-spam.fr</a> · <a className="text-white/35 hover:text-white/55 transition-colors" href="https://phishing-initiative.fr" target="_blank" rel="noopener noreferrer">phishing-initiative.fr</a> · <a className="text-white/35 hover:text-white/55 transition-colors" href="https://cybermalveillance.gouv.fr" target="_blank" rel="noopener noreferrer">cybermalveillance.gouv.fr</a></p>
+        <footer style={{ marginTop: 40, textAlign: "center", fontSize: 11, color: "var(--text-faint)", lineHeight: 2 }}>
+          <p>AstraScan v3 · Moteur contextuel · PhishTank · Levenshtein · Tesseract OCR · EXIF</p>
+          <p>
+            {[
+              ["signal-spam.fr", "https://signal-spam.fr"],
+              ["phishing-initiative.fr", "https://phishing-initiative.fr"],
+              ["cybermalveillance.gouv.fr", "https://www.cybermalveillance.gouv.fr"],
+              ["signal.conso.gouv.fr", "https://signal.conso.gouv.fr"],
+            ].map(([label, url], i) => (
+              <span key={label}>
+                {i > 0 && <span style={{ margin: "0 6px", opacity: 0.4 }}>·</span>}
+                <a href={url} target="_blank" rel="noopener noreferrer"
+                  style={{ color: "var(--text-faint)", textDecoration: "none" }}>{label}</a>
+              </span>
+            ))}
+          </p>
         </footer>
       </div>
     </main>

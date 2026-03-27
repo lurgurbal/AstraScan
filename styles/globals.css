@@ -2,86 +2,156 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ════════════════════════════════════════════
+   DESIGN SYSTEM — AstraScan
+   Mode CLAIR par défaut, dark optionnel
+   ════════════════════════════════════════════ */
+
 :root {
   --font-sans: var(--font-sans, 'Space Grotesk', system-ui, sans-serif);
   --font-mono: var(--font-mono, 'JetBrains Mono', monospace);
+
+  /* Tokens thème CLAIR (défaut) */
+  --bg-page:        #f4f5f7;
+  --bg-card:        #ffffff;
+  --bg-card-hover:  #f9fafb;
+  --bg-input:       #ffffff;
+  --bg-subtle:      rgba(0,0,0,0.04);
+  --border-default: rgba(0,0,0,0.10);
+  --border-strong:  rgba(0,0,0,0.18);
+  --text-primary:   #0f1117;
+  --text-secondary: rgba(15,17,23,0.60);
+  --text-muted:     rgba(15,17,23,0.38);
+  --text-faint:     rgba(15,17,23,0.22);
+  --shadow-card:    0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  --nav-bg:         rgba(244,245,247,0.85);
+  --scrollbar:      rgba(0,0,0,0.12);
 }
 
-/* ── Mode sombre (défaut) ── */
-html, html.dark {
-  color-scheme: dark;
+/* Thème SOMBRE */
+html.dark {
+  --bg-page:        #070809;
+  --bg-card:        rgba(255,255,255,0.03);
+  --bg-card-hover:  rgba(255,255,255,0.05);
+  --bg-input:       rgba(255,255,255,0.05);
+  --bg-subtle:      rgba(255,255,255,0.04);
+  --border-default: rgba(255,255,255,0.08);
+  --border-strong:  rgba(255,255,255,0.15);
+  --text-primary:   #ffffff;
+  --text-secondary: rgba(255,255,255,0.60);
+  --text-muted:     rgba(255,255,255,0.38);
+  --text-faint:     rgba(255,255,255,0.22);
+  --shadow-card:    0 4px 24px rgba(0,0,0,0.5);
+  --nav-bg:         rgba(7,8,9,0.85);
+  --scrollbar:      rgba(255,255,255,0.10);
 }
 
-/* ── Mode clair ── */
-html.light {
-  color-scheme: light;
-}
-
-html.light body {
-  background: #f8f9fa;
-  color: #111;
-}
-
-html.light .bg-\[#070809\] {
-  background: #f8f9fa !important;
-}
-
-html.light .text-white {
-  color: #111 !important;
-}
-
-html.light .text-white\/50,
-html.light .text-white\/40,
-html.light .text-white\/30,
-html.light .text-white\/20,
-html.light .text-white\/25,
-html.light .text-white\/60,
-html.light .text-white\/70 {
-  color: rgba(0,0,0,0.5) !important;
-}
-
-html.light .border-white\/8,
-html.light .border-white\/10,
-html.light .border-white\/15 {
-  border-color: rgba(0,0,0,0.1) !important;
-}
-
-html.light .bg-white\/\[0\.02\],
-html.light .bg-white\/\[0\.03\],
-html.light .bg-white\/5 {
-  background: rgba(0,0,0,0.03) !important;
-}
-
-html.light .bg-white\/10 {
-  background: rgba(0,0,0,0.06) !important;
-}
-
-html.light textarea,
-html.light input[type="text"] {
-  background: white !important;
-  border-color: rgba(0,0,0,0.15) !important;
-  color: #111 !important;
-}
-
-html.light textarea::placeholder,
-html.light input::placeholder {
-  color: rgba(0,0,0,0.35) !important;
-}
-
+/* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { font-family: var(--font-sans); }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
-
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  transition: background-color 0.25s, color 0.25s;
+  min-height: 100vh;
 }
 
-::selection { background: rgba(239,68,68,0.3); color: #fff; }
+/* ── Classes utilitaires thème-aware ── */
+.bg-page    { background-color: var(--bg-page); }
+.bg-card    { background-color: var(--bg-card); }
+.text-primary   { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted     { color: var(--text-muted); }
+.text-faint     { color: var(--text-faint); }
+.border-default { border-color: var(--border-default); }
+.border-strong  { border-color: var(--border-strong); }
+
+/* ── Composants de base ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+.input-base {
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  border-radius: 12px;
+  transition: border-color 0.15s;
+}
+.input-base:focus { border-color: var(--border-strong); outline: none; }
+.input-base::placeholder { color: var(--text-muted); }
+
+.btn-primary {
+  background: var(--text-primary);
+  color: var(--bg-page);
+  font-weight: 600;
+  border-radius: 12px;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  border-radius: 12px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-ghost:hover { border-color: var(--border-strong); color: var(--text-primary); }
+
+/* ── Navigation ── */
+.nav-bar {
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--border-default);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Backgrounds page sombre avec glows ── */
+html.dark .page-glow-red {
+  background: radial-gradient(ellipse 600px 400px at -10% 0%, rgba(239,68,68,0.07) 0%, transparent 70%),
+              radial-gradient(ellipse 400px 300px at 110% 33%, rgba(249,115,22,0.05) 0%, transparent 70%),
+              #070809;
+}
+html.light .page-glow-red {
+  background: #f4f5f7;
+}
+
+/* ── Grid background (dark only) ── */
+html.dark .grid-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 999px; }
+textarea { scrollbar-width: thin; }
+
+/* ── Animations ── */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes ping-slow {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50% { opacity: 0; transform: scale(2); }
+}
+
+/* ── Sélection ── */
+::selection { background: rgba(239,68,68,0.25); }
 :focus-visible { outline: 2px solid rgba(239,68,68,0.5); outline-offset: 2px; border-radius: 4px; }
-textarea { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }

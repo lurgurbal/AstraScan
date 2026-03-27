@@ -1,14 +1,14 @@
 /**
- * app/layout.tsx
- * Layout racine de l'application Next.js.
- * Gère les métadonnées SEO et l'import des polices Google.
+ * app/layout.tsx — Layout racine avec ThemeProvider intégré.
+ * - Mode CLAIR par défaut
+ * - Script inline bloquant pour éviter le flash de thème (FOUC)
+ * - Polices Space Grotesk + JetBrains Mono
  */
 
 import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "@/styles/globals.css";
 
-// Police principale : Space Grotesk (moderne, tech)
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -16,7 +16,6 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
-// Police monospace : JetBrains Mono (pour les URLs, codes)
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
@@ -26,8 +25,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "AstraScan — Détectez les arnaques en un clic",
-  description:
-    "Analysez gratuitement vos messages suspects et URLs pour détecter les tentatives de phishing, arnaques et fraudes en ligne.",
+  description: "Analysez gratuitement vos messages suspects et URLs pour détecter les tentatives de phishing, arnaques et fraudes en ligne.",
   keywords: ["arnaque", "phishing", "scam", "détecteur", "sécurité", "fraud", "astrascan"],
   authors: [{ name: "AstraScan" }],
   icons: {
@@ -44,14 +42,29 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+// Script anti-FOUC : applique le thème sauvegardé AVANT le premier rendu
+// Mode CLAIR par défaut si aucune préférence sauvegardée
+const THEME_SCRIPT = `
+(function() {
+  try {
+    var saved = localStorage.getItem('astrascan_theme');
+    // Par défaut : light
+    var theme = saved || 'light';
+    document.documentElement.classList.add(theme);
+  } catch(e) {
+    document.documentElement.classList.add('light');
+  }
+})();
+`;
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
-      <body className="min-h-screen bg-[#070809] text-white antialiased">
+      <head>
+        {/* Script bloquant anti-FOUC — doit être en premier dans <head> */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
+      <body className="min-h-screen antialiased">
         {children}
       </body>
     </html>

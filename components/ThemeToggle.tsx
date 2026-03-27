@@ -1,21 +1,19 @@
 "use client";
-
 /**
- * ThemeToggle.tsx
- * Bouton pour basculer entre le mode clair et sombre.
+ * ThemeToggle.tsx — Bouton clair/sombre.
+ * Lit le thème depuis le DOM (pas useState init) pour éviter le flash.
  */
-
 import { useState, useEffect } from "react";
-import { getPreferredTheme, saveTheme, applyTheme, type Theme } from "@/lib/themeStore";
+import { saveTheme, applyTheme, type Theme } from "@/lib/themeStore";
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const preferred = getPreferredTheme();
-    setTheme(preferred);
-    applyTheme(preferred);
+    // Lire depuis le DOM (appliqué par le script anti-FOUC dans layout.tsx)
+    const isDark = document.documentElement.classList.contains("dark");
+    setTheme(isDark ? "dark" : "light");
     setMounted(true);
   }, []);
 
@@ -31,8 +29,18 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      title={theme === "dark" ? "Passer en mode clair" : "Passer en mode sombre"}
-      className="w-9 h-9 flex items-center justify-center rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200 text-base"
+      title={theme === "dark" ? "Mode clair" : "Mode sombre"}
+      style={{
+        width: 36, height: 36,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        borderRadius: 10,
+        border: "1px solid var(--border-default)",
+        background: "var(--bg-subtle)",
+        color: "var(--text-secondary)",
+        cursor: "pointer",
+        fontSize: 16,
+        transition: "all 0.15s",
+      }}
     >
       {theme === "dark" ? "☀️" : "🌙"}
     </button>

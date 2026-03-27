@@ -18,10 +18,7 @@ export default function PhoneForm() {
     if (!phone.trim()) return;
     setIsLoading(true); setResult(null); setError(null);
     try {
-      const res = await fetch("/api/analyze-phone", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
-      });
+      const res = await fetch("/api/analyze-phone", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone }) });
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Erreur"); return; }
       setResult(data);
@@ -31,36 +28,39 @@ export default function PhoneForm() {
     finally { setIsLoading(false); }
   };
 
+  const btnStyle = { height: 44, borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", border: "none", padding: "0 16px" };
+
   return (
     <div>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="relative flex items-center">
-          <span className="absolute left-4 text-white/30 text-sm select-none">📞</span>
+      <form onSubmit={handleSubmit}>
+        <div style={{ position: "relative", marginBottom: 14 }}>
+          <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: 14 }}>📞</span>
           <input type="text" value={phone} onChange={e => setPhone(e.target.value)}
-            placeholder="+33 6 12 34 56 78 ou 0899 23 45 67"
-            className="w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 py-3 text-sm text-white placeholder:text-white/30 outline-none focus:border-white/30 font-mono transition-all" />
+            placeholder="+33 6 12 34 56 78 ou 0899 23 45 67" maxLength={30}
+            className="input-base" style={{ width: "100%", paddingLeft: 40, paddingRight: 14, paddingTop: 10, paddingBottom: 10, fontSize: 13, fontFamily: "var(--font-mono)" }} />
         </div>
-        <div>
-          <p className="text-xs text-white/40 mb-2 uppercase tracking-widest">Exemples :</p>
-          <div className="flex flex-wrap gap-2">
+        <div style={{ marginBottom: 14 }}>
+          <p style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>Exemples :</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {EXAMPLES.map((ex, i) => (
-              <button key={i} type="button" onClick={() => setPhone(ex)}
-                className="text-xs px-3 py-1 rounded-full border border-white/10 bg-white/5 text-white/50 hover:text-white hover:border-white/30 transition-all font-mono">
-                {ex}
-              </button>
+              <button key={i} type="button" onClick={() => setPhone(ex)} style={{
+                fontSize: 11, padding: "4px 10px", borderRadius: 999,
+                border: "1px solid var(--border-default)", background: "var(--bg-subtle)",
+                color: "var(--text-secondary)", cursor: "pointer", fontFamily: "var(--font-mono)",
+              }}>{ex}</button>
             ))}
           </div>
         </div>
-        <div className="flex gap-3">
-          <button type="submit" disabled={!phone.trim() || isLoading}
-            className="flex-1 rounded-xl bg-white text-black font-semibold py-3 text-sm hover:bg-white/90 disabled:opacity-40 transition-all">
-            {isLoading ? <span className="flex items-center justify-center gap-2"><span className="h-4 w-4 rounded-full border-2 border-black/30 border-t-black animate-spin" />Analyse…</span> : "🔍 Analyser le numéro"}
+        <div style={{ display: "flex", gap: 10 }}>
+          <button type="submit" disabled={!phone.trim() || isLoading} className="btn-primary" style={{ ...btnStyle, flex: 1 }}>
+            {isLoading ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}><span style={{ width: 14, height: 14, border: "2px solid rgba(0,0,0,0.2)", borderTopColor: "var(--bg-page)", borderRadius: "50%", display: "inline-block", animation: "spin 0.8s linear infinite" }} />Analyse…</span> : "🔍 Analyser le numéro"}
           </button>
-          {(result || phone) && <button type="button" onClick={() => { setPhone(""); setResult(null); setError(null); }} className="px-4 rounded-xl border border-white/10 text-white/40 hover:text-white text-sm transition-all">Effacer</button>}
+          {(result || phone) && <button type="button" onClick={() => { setPhone(""); setResult(null); setError(null); }} className="btn-ghost" style={{ ...btnStyle, padding: "0 14px" }}>Effacer</button>}
         </div>
       </form>
-      {error && <div className="mt-4 rounded-xl border border-red-500/30 bg-red-950/30 p-4"><p className="text-red-400 text-sm">⚠ {error}</p></div>}
+      {error && <div style={{ marginTop: 12, borderRadius: 10, border: "1px solid rgba(239,68,68,0.3)", background: "rgba(239,68,68,0.07)", padding: 14 }}><p style={{ color: "#ef4444", fontSize: 13 }}>⚠ {error}</p></div>}
       <ResultCard result={result} isLoading={isLoading} error={null} />
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );
 }
